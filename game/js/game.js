@@ -6,23 +6,27 @@ const radius = 80;
 const fillColor = '#F93';
 const strokeSize = 5;
 const strokeColor = '#C40';
+const period = 0.5;
 let x = radius;
-let period = 0.5;
+let y = 0;
 
-initializeCanvas();
+initializeCanvas(c);
 setInterval(function () {
     refresh();
 }, period);
+document.addEventListener("keydown", onKeyDown);
 
 function refresh() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     x++;
     if (x > (width + radius))
         x = radius;
-    drawCircle(context, x, height - 80, radius, fillColor, strokeSize, strokeColor);
+    if(y > 0)
+        y--;
+    drawCircle(context, x, height - radius - y, radius, fillColor, strokeSize, strokeColor);
 }
 
-function initializeCanvas() {
+function initializeCanvas(canvas) {
     canvas.width = width;
     canvas.height = height;
 }
@@ -35,4 +39,8 @@ function drawCircle(ctx, x, y, r, fillColor, strokeSize, strokeColor) {
     ctx.lineWidth = strokeSize;
     ctx.stroke();
     context.strokeStyle = strokeColor;
+}
+
+function onKeyDown(){
+    y += 100;
 }
