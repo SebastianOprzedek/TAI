@@ -7,6 +7,8 @@ const fillColor = '#F93';
 const strokeSize = 5;
 const strokeColor = '#C40';
 const period = 0.5;
+voiceVolumeTriggerLevel = 250;
+numberOfSamples = 10;
 let x = radius;
 let y = 0;
 
@@ -14,7 +16,7 @@ initializeCanvas(c);
 setInterval(function () {
     refresh();
 }, period);
-document.addEventListener("keydown", onKeyDown);
+document.addEventListener("keydown", actionOnTrigger);
 
 function refresh() {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -23,6 +25,8 @@ function refresh() {
         x = radius;
     if(y > 0)
         y--;
+    if(isTriggered())
+        actionOnTrigger();
     drawCircle(context, x, height - radius - y, radius, fillColor, strokeSize, strokeColor);
 }
 
@@ -41,6 +45,8 @@ function drawCircle(ctx, x, y, r, fillColor, strokeSize, strokeColor) {
     context.strokeStyle = strokeColor;
 }
 
-function onKeyDown(){
+function actionOnTrigger(){
     y += 100;
+    if(y > (height - radius))
+        y = (height - radius);
 }
