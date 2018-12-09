@@ -8,10 +8,20 @@ function setVoiceVolume(volume) {
         triggered = true;
 }
 
-function isTriggered() {
+function isJumpTriggered() {
     let tempTriggerValue = triggered;
     triggered = false;
     return tempTriggerValue;
+}
+
+function isMovingTriggered() {
+    // TODO
+    return false;
+}
+
+function isMovingStopped() {
+    // TODO
+    return false;
 }
 
 const microphoneController = function () {
