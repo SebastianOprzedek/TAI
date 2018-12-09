@@ -1,0 +1,33 @@
+﻿1.     Tytuł projektu
+
+Gra sterowana dźwiękiem.
+
+2.     Cele projektu
+
+Celem projektu jest stworzenie aplikacji będącej dwuwymiarową grą sterowaną za pomocą głosu rejestrowanego przez mikrofon. Gra polegać będzie na sterowaniu postacią, przemieszczającą się przed siebie po platformach oddzielonych od siebie przeszkodami, które będzie musiała przeskakiwać.
+
+Wykrywanie częstotliwości dźwięku. W zależności od częstotliwości dźwięku rejestrowanego przez mikrofon postać będzie szła - niska częstotliwość lub skakała - wysoka częstotliwość (zakresów nie jesteśmy w stanie podać w tej chwili, dokładne wartości ustalimy przy testach).
+
+Wykrywanie natężenia dźwięku. Prędkość przemieszczania się postaci będzie regulowana natężeniem dźwięku. Gra kończy się w momencie kontaktu z przeszkodą lub spadnięcia w przerwę pomiędzy platformami. Wynik końcowy liczony jest w pokonanych przeszkodach oraz przeskoczonych platformach.
+
+Wykorzystanie technologii webowych. Do tworzenia aplikacji wykorzystane zostanie popularne współcześnie rozwiązanie technologiczne, czyli połączenie JavaScript oraz HTML5.
+
+4.     Zakres projektu
+
+Zakres projektu obejmuje implementację gry w języku JavaScript oraz jej obsługę za pomocą mikrofonu komputera.Interakcja będzie się odbywała na podstawie analizy częstotliwości oraz natężenia dźwięku.
+
+5.     Etapy w projekcie
+
+Definicja wymagań
+Podział pracy
+Przygotowanie środowiska
+Opanowanie obsługi mikrofonu
+Zaprojektowanie postaci
+Implementacja poruszania się postaci z wykorzystaniem klawiszy
+Implementacja mechaniki gry
+Implementacja poruszania się za pomocą mikrofonu
+Testy
+
+6.     Charakterystyka narzędzi
+
+Do tworzenia projektu wykorzystamy oprogramowanie WebStorm JetBrains. Będziemy pisać w języku JavaScript bez wykorzystania dodatkowych frameworków. Projekt będzie wykorzystywał serwer node.js. Do obsługi mikrofonu użyjemy interfejsu NavigatorUserMedia, a do obrabiania dźwięku i wykrywania jego częstotliwości oraz natężenia użyjemy klas GainNode, AudioContext oraz MediaStream. Wszystkie wymienione klasy oraz interfejs wchodzą w skład języka JavaScript.
