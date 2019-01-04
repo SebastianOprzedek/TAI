@@ -359,32 +359,37 @@ with special handling for nodes with custom interfaces (e.g. reverb, delay). **/
         // console.log('nodes? ', that.nodes)
         var destination = ( arg && arg.destination ) || that.destination;
         for ( var i = 1; i < that.nodes.length; i++ ) {
-            if ( that.nodes[i-1].interface === 'custom' ) {
+            if (that.nodes[i-1] && that.nodes[i-1].interface === 'custom' ) {
                 var from = that.nodes[i-1].output;
             }
             else { // assume native interface
                 var from = that.nodes[i-1];
             }
-            if ( that.nodes[i].interface === 'custom' ) {
+            if (that.nodes[i] && that.nodes[i].interface === 'custom' ) {
                 var to = that.nodes[i].input
             }
             else { // assume native interface
                 var to = that.nodes[i]
             }
-            from.connect(to);
+            if(from)
+                from.connect(to);
         }
-        if ( that.nodes[that.nodes.length-1].interface === 'custom') {
+        if (that.nodes[that.nodes.length-1] && that.nodes[that.nodes.length-1].interface === 'custom') {
             var lastStop = that.nodes[that.nodes.length-1].output;
         }
         else { // assume native interface
             var lastStop = that.nodes[that.nodes.length-1];
         }
+        if(lastStop)
         lastStop.connect(destination);
 
         /** Global reverb is super deprecated, and should be removed at some point. **/
         if ( Wad.reverb && that.globalReverb ) {
+            if(that.nodes[that.nodes.length - 1])
             that.nodes[that.nodes.length - 1].connect(Wad.reverb.node);
+            if(Wad.reverb.node)
             Wad.reverb.node.connect(Wad.reverb.gain);
+            if(Wad.reverb.gain)
             Wad.reverb.gain.connect(destination);
         }
         /**************************************************************************/
@@ -478,9 +483,13 @@ with special handling for nodes with custom interfaces (e.g. reverb, delay). **/
         reverbNode.convolver.buffer = that.reverb.buffer;
         reverbNode.wet.gain.value   = that.reverb.wet;
 
-        reverbNode.input.connect(reverbNode.convolver);
-        reverbNode.input.connect(reverbNode.output);
+        if(reverbNode.input){
+            reverbNode.input.connect(reverbNode.convolver);
+            reverbNode.input.connect(reverbNode.output);
+        }
+        if(reverbNode.convolver)
         reverbNode.convolver.connect(reverbNode.wet);
+        if(reverbNode.wet)
         reverbNode.wet.connect(reverbNode.output);
 
         that.reverb.node = reverbNode;
@@ -564,11 +573,17 @@ with special handling for nodes with custom interfaces (e.g. reverb, delay). **/
 
 
             //set up the routing
-            delayNode.input.connect(delayNode.delayNode);
-            delayNode.input.connect(delayNode.output);
-            delayNode.delayNode.connect(delayNode.feedbackNode);
-            delayNode.delayNode.connect(delayNode.wetNode);
+            if(delayNode.input){
+                delayNode.input.connect(delayNode.delayNode);
+                delayNode.input.connect(delayNode.output);
+            }
+            if(delayNode.delayNode){
+                delayNode.delayNode.connect(delayNode.feedbackNode);
+                delayNode.delayNode.connect(delayNode.wetNode);
+            }
+            if(delayNode.feedbackNode)
             delayNode.feedbackNode.connect(delayNode.delayNode);
+            if(delayNode.wetNode)
             delayNode.wetNode.connect(delayNode.output);
             that.delay.delayNode = delayNode;
 
@@ -1121,6 +1136,7 @@ Copyright (c) 2014 Chris Wilson
             this.wads.push(wad);
             if ( wad instanceof Wad.Poly ) {
                 wad.output.disconnect(0);
+                if(wad.output)
                 wad.output.connect(this.input);
             }
         }
@@ -1140,6 +1156,7 @@ Copyright (c) 2014 Chris Wilson
                     this.wads.splice(i,1);
                     if ( wad instanceof Wad.Poly ) {
                         wad.output.disconnect(0);
+                        if(wad.output)
                         wad.output.connect(context.destination);
                     }
                 }

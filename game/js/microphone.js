@@ -1,33 +1,45 @@
 let numberOfSamples = 10;
-let voiceVolumeTriggerLevel = 250;
+let voiceVolumeTriggerLevel = 200;
+let frequencyForJumping = 200;
 let triggered = false;
+let freqtrig = false;
 
-function detectFreq(){
-    let voice = new Wad({source : 'mic' });
+function detectFreq() {
+    let voice = new Wad({source: 'mic'});
     let tuner = new Wad.Poly();
     tuner.add(voice);
     voice.play({
-        volume  :   0.0
+
     });
     tuner.updatePitch();
-    let logPitch = function(){
-        console.log(tuner.pitch, tuner.noteName)
-        requestAnimationFrame(logPitch)
+
+    var logPitch = function () {
+        //console.log(tuner.pitch, tuner.noteName)
+        requestAnimationFrame(logPitch);
+        return tuner.pitch; //tutaj widzi tuner.pitch
     };
-    logPitch();
+    var result =  logPitch(); //tu juz nie
+    console.log(result);
+    return result;
 }
 
 function setVoiceVolume(volume) {
-    console.log(volume);
-    //detectFreq();
+    //console.log(volume);
+    let freq = detectFreq(); //tu pobiera i jest undefined
+    //console.log(freq);
     if (volume >= voiceVolumeTriggerLevel)
         triggered = true;
+    if (freq >= frequencyForJumping)
+        freqtrig = true;
 }
 
 function isJumpTriggered() {
     let tempTriggerValue = triggered;
+    let frequencyValue = freqtrig;
+    //console.log(frequencyValue);
     triggered = false;
-    return tempTriggerValue;
+    freqtrig = false;
+    return tempTriggerValue && frequencyValue;
 }
 
 function isMovingTriggered() {
@@ -65,6 +77,7 @@ const microphoneController = function () {
     } else {
         alert('getUserMedia not supported in this browser.');
     }
+
     function show_some_data(given_typed_array, num_row_to_display, label) {
         let size_buffer = given_typed_array.length;
         let index = 0;
@@ -77,12 +90,14 @@ const microphoneController = function () {
         }
         setVoiceVolume(maxVolume);
     }
+
     function process_microphone_buffer(event) {
         var i, N, inp, microphone_output_buffer;
         microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
         // microphone_output_buffer  <-- this buffer contains current gulp of data size BUFF_SIZE
         show_some_data(microphone_output_buffer, numberOfSamples, "from getChannelData");
     }
+
     function start_microphone(stream) {
         gain_node = audioContext.createGain();
         gain_node.connect(audioContext.destination);
