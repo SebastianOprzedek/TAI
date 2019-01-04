@@ -2,8 +2,24 @@ let numberOfSamples = 10;
 let voiceVolumeTriggerLevel = 250;
 let triggered = false;
 
+function detectFreq(){
+    let voice = new Wad({source : 'mic' });
+    let tuner = new Wad.Poly();
+    tuner.add(voice);
+    voice.play({
+        volume  :   0.0
+    });
+    tuner.updatePitch();
+    let logPitch = function(){
+        console.log(tuner.pitch, tuner.noteName)
+        requestAnimationFrame(logPitch)
+    };
+    logPitch();
+}
+
 function setVoiceVolume(volume) {
     console.log(volume);
+    //detectFreq();
     if (volume >= voiceVolumeTriggerLevel)
         triggered = true;
 }

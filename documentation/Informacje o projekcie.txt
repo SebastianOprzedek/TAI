@@ -2,7 +2,11 @@
 
 Gra sterowana dźwiękiem.
 
-2.     Cele projektu
+2.     Wizja projektu
+
+Celem projektu jest stworzenie aplikacji webowej sterowanej dźwiękiem. Aplikacja ta będzie prostą grą polegającą na sterowaniu postacią za pomocą wydawanych z siebie dźwięków o różnych częstotliwościach i natężeniu tak, aby z powodzeniem pokonywała przeszkody i przemieściła się jak najdalej od punktu startu. W projekcie wykorzystany zostanie HTML5, który w dzisiejszych czasach praktycznie całkowicie wypiera Adobe Flash Player. Przeglądarki przejmują coraz więcej funkcji od aplikacji desktopowych, w tym obsługę mikrofonu lub kamery (na przykład webowy Skype), a nawet powstają gry wykorzystujące jedynie JavaScript oraz HTML5, obsługiwane całkowicie w przeglądarce. Dźwięk analizować będziemy za pomocą różnych klas języka JavaScript (między innymi GainNode, AudioContext czy MediaStream). Do testowania wykorzystamy mikrofony wolnostojące oraz wbudowane (w laptopach). Dzięki jej stworzeniu poznamy lepiej język JavaScript oraz jego integrację z urządzeniami wejściowymi (w tym przypadku głównie mikrofonu).
+
+3.     Cele projektu
 
 Celem projektu jest stworzenie aplikacji będącej dwuwymiarową grą sterowaną za pomocą głosu rejestrowanego przez mikrofon. Gra polegać będzie na sterowaniu postacią, przemieszczającą się przed siebie po platformach oddzielonych od siebie przeszkodami, które będzie musiała przeskakiwać.
 
