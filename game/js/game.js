@@ -58,12 +58,12 @@ function checkIfOver(){
 
 function calculatePositions(){
     if(moving)
-        x++;
+        x = x +2;
     if (isJumpTriggered())
         jump();
     if (isMovingTriggered())
         startMoving();
-    if (isMovingStopped())
+    else
         stopMoving();
     if (x > (width + squareSize))
         x = 0;
@@ -124,7 +124,7 @@ function keyDownAction(e) {
 }
 
 function jump(){
-    y += 100;
+    y += 50;
     if(y > (height - platformBottomMargin))
         y = (height - platformBottomMargin);
 }

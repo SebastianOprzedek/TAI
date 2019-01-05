@@ -12,10 +12,13 @@ var canvasElem,
     noteElem,
     detuneElem,
     detuneAmount;
+var ac = null;
 
 let numberOfSamples = 10;
 let voiceVolumeTriggerLevel = 250;
+let voiceFrequencyTriggerLevel = 1000;
 let triggered = false;
+let freq = false;
 
 window.onload = function () {
     toggleLiveInput();
@@ -140,11 +143,11 @@ function autoCorrelate(buf, sampleRate) {
 
 function updatePitch(time) {
     analyser.getFloatTimeDomainData(buf);
-    var ac = autoCorrelate(buf, audioContext.sampleRate);
-
+    ac = autoCorrelate(buf, audioContext.sampleRate);
     if (ac !== -1) {
         console.log(Math.round(ac));
     }
+    setFrequency();
 
     if (!window.requestAnimationFrame)
         window.requestAnimationFrame = window.webkitRequestAnimationFrame;
@@ -152,9 +155,16 @@ function updatePitch(time) {
 }
 
 function setVoiceVolume(volume) {
-    console.log(volume);
+    //console.log(volume);
     if (volume >= voiceVolumeTriggerLevel)
         triggered = true;
+}
+
+function setFrequency() {
+    if (ac >= voiceFrequencyTriggerLevel)
+        freq = true;
+    else
+        freq = false;
 }
 
 function isJumpTriggered() {
@@ -165,12 +175,9 @@ function isJumpTriggered() {
 
 function isMovingTriggered() {
     // TODO
-    return false;
-}
-
-function isMovingStopped() {
-    // TODO
-    return false;
+    let freqTriggerValue = freq;
+    freq = false;
+    return freqTriggerValue;
 }
 
 const microphoneController = function () {
@@ -219,6 +226,7 @@ const microphoneController = function () {
     function start_microphone(stream) {
         gain_node = audioContext.createGain();
         gain_node.connect(audioContext.destination);
+        gain_node.gain.value = 0;
         microphone_stream = audioContext.createMediaStreamSource(stream);
         microphone_stream.connect(gain_node);
         script_processor_node = audioContext.createScriptProcessor(BUFF_SIZE, 1, 1);
