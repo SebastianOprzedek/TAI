@@ -46,7 +46,7 @@ function refresh() {
     if(x <= borderPlayerShift){
         //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
         for (let i = 0; i < listOfPlatforms.length; i++) {
-            drawRect(context, sumOfPlatformXAxis, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+            drawRect(context, sumOfPlatformXAxis, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, listOfPlatforms[i].color, strokeSize, strokeColor);
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
         sumOfPlatformXAxis = 0;
@@ -58,21 +58,12 @@ function refresh() {
             //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
         }
         for (let i = 0; i < listOfPlatforms.length; i++) {
-            drawRect(context, sumOfPlatformXAxis - xAxisFromStart, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+            drawRect(context, sumOfPlatformXAxis - xAxisFromStart, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight,  listOfPlatforms[i].color, strokeSize, strokeColor);
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
         sumOfPlatformXAxis= 0;
     } 
 }
-
-// function refresh() {
-//     context.clearRect(0, 0, canvas.width, canvas.height);
-//     shouldReset();
-//         drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
-//         for (let i = 0; i < numberOfPlatforms; i++) {
-//             drawRect(context, i * (platformWidth + platformGap), platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
-//     }   
-// }
 
 function randomValues(){
     i = platformSizes.length,
@@ -82,13 +73,25 @@ function randomValues(){
 
 function createPlatformList(){
     listOfPlatforms = [
-        { platformGap: 100, platformWidth: 250, color: '#F93' },
+        { platformGap: 100, platformWidth: 250, color: '#F13' },
         { platformGap: 200, platformWidth: 300, color: '#F93' },
-        { platformGap: 130, platformWidth: 100, color: '#F93' },
-        { platformGap: 120, platformWidth: 80, color: '#F93' },
-        { platformGap: 250, platformWidth: 250, color: '#F93' },
-        { platformGap: 200, platformWidth: 250, color: '#F93' },
+        { platformGap: 120, platformWidth: 80, color: '#F124' },
+        { platformGap: 200, platformWidth: 300, color: '#F93' },
+        { platformGap: 250, platformWidth: 250, color: '#F14'  },
+        { platformGap: 200, platformWidth: 250, color: '#F117' },
     ];
+
+    
+}
+
+function AddAdditionalPlatforms(){
+    listOfPlatforms.push({ platformGap: 100, platformWidth: 250, color: '#F13' })
+    listOfPlatforms.push({ platformGap: 200, platformWidth: 300, color: '#F93' })
+    listOfPlatforms.push({ platformGap: 130, platformWidth: 100, color: '#F50' })
+    listOfPlatforms.push({ platformGap: 120, platformWidth: 80, color: '#F124' })
+    listOfPlatforms.push({ platformGap: 100, platformWidth: 250, color: '#F13' })
+    listOfPlatforms.push({ platformGap: 250, platformWidth: 250, color: '#F14' })
+    listOfPlatforms.push({ platformGap: 200, platformWidth: 250, color: '#F117' })
 }
 
 function shouldReset(){
@@ -142,6 +145,9 @@ function isOnPlatform(){
         if((x + squareSize) > platformPosition - xAxisFromStart && x < platformPosition + listOfPlatforms[i].platformWidth- xAxisFromStart){
             points = i;
             document.getElementById("points").innerHTML = "points: " + points;
+            if(listOfPlatforms.length < points + 3){
+                AddAdditionalPlatforms();
+            }
             return true;
         }     
     }
