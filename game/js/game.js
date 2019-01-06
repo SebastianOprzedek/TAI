@@ -1,22 +1,28 @@
 const c = document.getElementById("canvas");
 const context = c.getContext("2d");
+//const context = c.getContext("bird");
 const height = window.innerHeight;
 const width = window.innerWidth;
 const platformBottomMargin = 200;
 const platformWidth = 250;
 const platformHeight = 50;
 const platformYPosition = height - platformHeight - platformBottomMargin;
-const platformGap = 200;
+const platformGap = 150;
 const squareSize = 100;
-const numberOfPlatforms = Math.floor((width + platformGap) / (platformWidth + platformGap));
+//const numberOfPlatforms = Math.round((width + platformGap) / (platformWidth + platformGap));
+const numberOfPlatforms =20;
 const fillColor = '#F93';
 const strokeSize = 5;
 const strokeColor = '#C40';
 const period = 0.0005;
+const borderPlayerShift = 400;
+const moveValue = 4;
 voiceVolumeTriggerLevel = 250;
 numberOfSamples = 10;
+xAxisFromStart = 0;
 let x = 0;
 let y = 0;
+
 let moving = false;
 let over = false;
 
@@ -29,6 +35,36 @@ document.addEventListener("keydown", keyDownAction);
 
 function refresh() {
     context.clearRect(0, 0, canvas.width, canvas.height);
+    shouldReset();
+    drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
+    if(x <= borderPlayerShift){
+        //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
+        for (let i = 0; i < numberOfPlatforms; i++) {
+            drawRect(context, i * (platformWidth + platformGap), platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+        }
+    }
+    else{
+        if(moving){
+            xAxisFromStart = xAxisFromStart + moveValue;
+            x = x - moveValue;
+            //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
+        }
+        for (let i = 0; i < numberOfPlatforms; i++) {
+            drawRect(context, i * (platformWidth + platformGap) - xAxisFromStart, platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+        }
+    } 
+}
+
+// function refresh() {
+//     context.clearRect(0, 0, canvas.width, canvas.height);
+//     shouldReset();
+//         drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
+//         for (let i = 0; i < numberOfPlatforms; i++) {
+//             drawRect(context, i * (platformWidth + platformGap), platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+//     }   
+// }
+
+function shouldReset(){
     if(!over) {
         calculatePositions();
         checkIfOver();
@@ -38,10 +74,6 @@ function refresh() {
         if((y + platformHeight + squareSize) < -platformBottomMargin)
             resetGame();
     }
-    drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
-    for (let i = 0; i < numberOfPlatforms; i++) {
-        drawRect(context, i * (platformWidth + platformGap), platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
-    }
 }
 
 function resetGame(){
@@ -49,6 +81,7 @@ function resetGame(){
     y = 0;
     moving = false;
     over = false;
+    xAxisFromStart = 0;
 }
 
 function checkIfOver(){
@@ -58,7 +91,7 @@ function checkIfOver(){
 
 function calculatePositions(){
     if(moving)
-        x = x +4;
+        x = x + moveValue;
     if (isJumpTriggered())
         jump();
     if (isMovingTriggered())
@@ -73,7 +106,8 @@ function calculatePositions(){
 
 function isOnPlatform(){
     for (let i = 0; i < numberOfPlatforms; i++) {
-        let platformPosition = i * (platformWidth + platformGap);
+        //let platformPosition = i * (platformWidth + platformGap);
+        let platformPosition = i * (platformWidth + platformGap) - xAxisFromStart;
         if((x + squareSize) > platformPosition && x < platformPosition + platformWidth)
             return true;
     }
@@ -81,6 +115,7 @@ function isOnPlatform(){
 }
 
 function initializeCanvas(canvas) {
+    //startScreen();
     canvas.width = width;
     canvas.height = height;
 }
@@ -100,9 +135,26 @@ function drawCircle(ctx, x, y, r, fillColor, strokeSize, strokeColor) {
 }
 
 function drawRect(ctx, x, y, width, height, fillColor, strokeSize, strokeColor) {
+    //myGamePiece = new component(30, 30, "smiley.gif", 10, 120, "image");
     ctx.beginPath();
     ctx.rect(x, y, width, height);
     setFigureStyle(ctx, fillColor, strokeSize, strokeColor);
+    //ctx.toDataURL("assets/bird-icon/png");
+    //ctx.drawImage("C:\Users\azslo\Desktop\SIiM\multimedia\assets\bird-icon.png", 10, 10); 
+}
+
+function drawImage(ctx, x, y, width, height, fillColor, strokeSize, strokeColor) {
+    ctx.beginPath();
+    var sticky = new Image();
+    sticky.src = "assets\bird-icon.png";
+    sticky.refresh = function() {
+        context.drawImage(sticky, 0, 0);
+    };
+    //ctx.drawImage(, x, y, width, height); 
+    //ctx.stroke();
+    //setFigureStyle(ctx, fillColor, strokeSize, strokeColor);
+    //ctx.toDataURL("assets/bird-icon/png");
+    //ctx.drawImage("C:\Users\azslo\Desktop\SIiM\multimedia\assets\bird-icon.png", 10, 10); 
 }
 
 function keyUpAction(e) {

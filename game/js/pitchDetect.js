@@ -170,7 +170,7 @@ function updatePitch(time) {
 }
 
 function setVoiceVolume(volume) {
-    //console.log(volume);
+    console.log("volume:" + volume);
     if (volume >= voiceVolumeTriggerLevel)
         triggered = true;
 }
