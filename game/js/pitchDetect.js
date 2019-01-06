@@ -13,10 +13,12 @@ var canvasElem,
     detuneElem,
     detuneAmount;
 var ac = null;
+var incr = 0;
+var counter = 0;
 
 let numberOfSamples = 10;
 let voiceVolumeTriggerLevel = 250;
-let voiceFrequencyTriggerLevel = 1000;
+let voiceFrequencyTriggerLevel = 1500;
 let triggered = false;
 let freq = false;
 
@@ -145,9 +147,22 @@ function updatePitch(time) {
     analyser.getFloatTimeDomainData(buf);
     ac = autoCorrelate(buf, audioContext.sampleRate);
     if (ac !== -1) {
+        pitchElem.innerText = Math.round(ac);
         console.log(Math.round(ac));
     }
-    setFrequency();
+    else{
+        pitchElem.innerText = "--";
+    }
+    counter++;
+    if(ac < 1600 && ac > 1500){
+        incr = incr + ac;
+    }
+
+    if(counter >= 2 && (incr/2) >= 1500){
+        setFrequency();
+        counter = 0;
+        incr = 0;
+    }
 
     if (!window.requestAnimationFrame)
         window.requestAnimationFrame = window.webkitRequestAnimationFrame;
@@ -174,7 +189,6 @@ function isJumpTriggered() {
 }
 
 function isMovingTriggered() {
-    // TODO
     let freqTriggerValue = freq;
     freq = false;
     return freqTriggerValue;
@@ -219,8 +233,7 @@ const microphoneController = function () {
     }
     function process_microphone_buffer(event) {
         var i, N, inp, microphone_output_buffer;
-        microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
-        // microphone_output_buffer  <-- this buffer contains current gulp of data size BUFF_SIZE
+        microphone_output_buffer = event.inputBuffer.getChannelData(0);
         show_some_data(microphone_output_buffer, numberOfSamples, "from getChannelData");
     }
     function start_microphone(stream) {

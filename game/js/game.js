@@ -58,7 +58,7 @@ function checkIfOver(){
 
 function calculatePositions(){
     if(moving)
-        x = x +2;
+        x = x +4;
     if (isJumpTriggered())
         jump();
     if (isMovingTriggered())
