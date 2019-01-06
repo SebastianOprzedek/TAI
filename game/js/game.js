@@ -72,8 +72,11 @@ function shouldReset(){
     }
     else {
         y--;
-        if((y + platformHeight + squareSize) < -platformBottomMargin)
+        if((y + platformHeight + squareSize) < -platformBottomMargin){
+            alert("You are dead! Your score: " + points);
             resetGame();
+        }
+            
     }
 }
 
