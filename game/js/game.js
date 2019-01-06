@@ -10,7 +10,7 @@ const platformYPosition = height - platformHeight - platformBottomMargin;
 const platformGap = 150;
 const squareSize = 100;
 //const numberOfPlatforms = Math.round((width + platformGap) / (platformWidth + platformGap));
-const numberOfPlatforms =20;
+const numberOfPlatforms = 20;
 const fillColor = '#F93';
 const strokeSize = 5;
 const strokeColor = '#C40';
@@ -20,6 +20,7 @@ const moveValue = 4;
 voiceVolumeTriggerLevel = 250;
 numberOfSamples = 10;
 xAxisFromStart = 0;
+points = 0;
 let x = 0;
 let y = 0;
 
@@ -108,8 +109,11 @@ function isOnPlatform(){
     for (let i = 0; i < numberOfPlatforms; i++) {
         //let platformPosition = i * (platformWidth + platformGap);
         let platformPosition = i * (platformWidth + platformGap) - xAxisFromStart;
-        if((x + squareSize) > platformPosition && x < platformPosition + platformWidth)
+        if((x + squareSize) > platformPosition && x < platformPosition + platformWidth){
+            points = i;
+            document.getElementById("points").innerHTML = "points: " + points;
             return true;
+        }     
     }
     return false;
 }
