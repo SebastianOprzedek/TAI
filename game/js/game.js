@@ -21,13 +21,17 @@ voiceVolumeTriggerLevel = 250;
 numberOfSamples = 10;
 xAxisFromStart = 0;
 points = 0;
+listOfPlatforms = new Array();
+sumOfXAxisOfPreviousPlatforms = 0;
 let x = 0;
 let y = 0;
+var platformSizes = [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250];
 
 let moving = false;
 let over = false;
 
 initializeCanvas(c);
+createPlatformList();
 setInterval(function () {
     refresh();
 }, period);
@@ -38,11 +42,14 @@ function refresh() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     shouldReset();
     drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
+    let sumOfPlatformXAxis = 0;
     if(x <= borderPlayerShift){
         //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
-        for (let i = 0; i < numberOfPlatforms; i++) {
-            drawRect(context, i * (platformWidth + platformGap), platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+        for (let i = 0; i < listOfPlatforms.length; i++) {
+            drawRect(context, sumOfPlatformXAxis, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+            sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
+        sumOfPlatformXAxis = 0;
     }
     else{
         if(moving){
@@ -50,9 +57,11 @@ function refresh() {
             x = x - moveValue;
             //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
         }
-        for (let i = 0; i < numberOfPlatforms; i++) {
-            drawRect(context, i * (platformWidth + platformGap) - xAxisFromStart, platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+        for (let i = 0; i < listOfPlatforms.length; i++) {
+            drawRect(context, sumOfPlatformXAxis - xAxisFromStart, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
+            sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
+        sumOfPlatformXAxis= 0;
     } 
 }
 
@@ -64,6 +73,23 @@ function refresh() {
 //             drawRect(context, i * (platformWidth + platformGap), platformYPosition, platformWidth, platformHeight, fillColor, strokeSize, strokeColor);
 //     }   
 // }
+
+function randomValues(){
+    i = platformSizes.length,
+    j = Math.floor(Math.random() * (i+1));
+    return j;
+}
+
+function createPlatformList(){
+    listOfPlatforms = [
+        { platformGap: 100, platformWidth: 250, color: '#F93' },
+        { platformGap: 200, platformWidth: 300, color: '#F93' },
+        { platformGap: 130, platformWidth: 100, color: '#F93' },
+        { platformGap: 120, platformWidth: 80, color: '#F93' },
+        { platformGap: 250, platformWidth: 250, color: '#F93' },
+        { platformGap: 200, platformWidth: 250, color: '#F93' },
+    ];
+}
 
 function shouldReset(){
     if(!over) {
@@ -109,10 +135,11 @@ function calculatePositions(){
 }
 
 function isOnPlatform(){
-    for (let i = 0; i < numberOfPlatforms; i++) {
-        //let platformPosition = i * (platformWidth + platformGap);
-        let platformPosition = i * (platformWidth + platformGap) - xAxisFromStart;
-        if((x + squareSize) > platformPosition && x < platformPosition + platformWidth){
+    sumOfXAxisOfPreviousPlatforms = 0;
+    for (let i = 0; i < listOfPlatforms.length; i++) {
+        let platformPosition = sumOfXAxisOfPreviousPlatforms;  
+        sumOfXAxisOfPreviousPlatforms = platformPosition + (listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap);
+        if((x + squareSize) > platformPosition - xAxisFromStart && x < platformPosition + listOfPlatforms[i].platformWidth- xAxisFromStart){
             points = i;
             document.getElementById("points").innerHTML = "points: " + points;
             return true;
