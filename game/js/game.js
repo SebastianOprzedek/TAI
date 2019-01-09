@@ -28,6 +28,7 @@ let y = 0;
 let moving = false;
 let over = false;
 
+loadingScreen();
 initializeCanvas(c);
 createPlatformList();
 setInterval(function () {
@@ -219,3 +220,23 @@ function startMoving(){
 function stopMoving(){
     moving = false;
 }
+
+function loadingScreen(){
+    var preload = document.getElementById("preload");
+    var loading = 0;
+    var id = setInterval(frame, 64);
+   
+    function frame(){
+     if(loading == 100) {
+        preload.style.display = "none";
+        clearInterval(id);
+        //window.open("welcome.html", "_self");
+     }
+     else {
+      loading = loading + 1;
+      if(loading == 90) {
+       preload.style.animation = "fadeout 1s ease";
+      }
+     }
+    }
+   };
