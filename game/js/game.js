@@ -25,8 +25,6 @@ listOfPlatforms = new Array();
 sumOfXAxisOfPreviousPlatforms = 0;
 let x = 0;
 let y = 0;
-var platformSizes = [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250];
-
 let moving = false;
 let over = false;
 
@@ -65,33 +63,25 @@ function refresh() {
     } 
 }
 
-function randomValues(){
-    i = platformSizes.length,
-    j = Math.floor(Math.random() * (i+1));
-    return j;
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getRandomColor() {
+    let color = "#F" + getRandomInt(13, 160);
+    return color;
+}
 function createPlatformList(){
     listOfPlatforms = [
-        { platformGap: 100, platformWidth: 250, color: '#F13' },
-        { platformGap: 200, platformWidth: 300, color: '#F93' },
-        { platformGap: 120, platformWidth: 80, color: '#F124' },
-        { platformGap: 200, platformWidth: 300, color: '#F93' },
-        { platformGap: 250, platformWidth: 250, color: '#F14'  },
-        { platformGap: 200, platformWidth: 250, color: '#F117' },
+        { platformGap: getRandomInt(80,250), platformWidth: getRandomInt(80,320), color: getRandomColor() },
     ];
-
-    
+    AddAdditionalPlatforms();
 }
 
 function AddAdditionalPlatforms(){
-    listOfPlatforms.push({ platformGap: 100, platformWidth: 250, color: '#F13' })
-    listOfPlatforms.push({ platformGap: 200, platformWidth: 300, color: '#F93' })
-    listOfPlatforms.push({ platformGap: 130, platformWidth: 100, color: '#F50' })
-    listOfPlatforms.push({ platformGap: 120, platformWidth: 80, color: '#F124' })
-    listOfPlatforms.push({ platformGap: 100, platformWidth: 250, color: '#F13' })
-    listOfPlatforms.push({ platformGap: 250, platformWidth: 250, color: '#F14' })
-    listOfPlatforms.push({ platformGap: 200, platformWidth: 250, color: '#F117' })
+    for (let i = 0; i < 8; i++){
+        listOfPlatforms.push({ platformGap: getRandomInt(80,250), platformWidth: getRandomInt(80,320), color: getRandomColor() })
+    }
 }
 
 function shouldReset(){
@@ -104,8 +94,7 @@ function shouldReset(){
         if((y + platformHeight + squareSize) < -platformBottomMargin){
             alert("You are dead! Your score: " + points);
             resetGame();
-        }
-            
+        }    
     }
 }
 
@@ -115,6 +104,8 @@ function resetGame(){
     moving = false;
     over = false;
     xAxisFromStart = 0;
+    listOfPlatforms = [];
+    createPlatformList();
 }
 
 function checkIfOver(){
@@ -145,7 +136,7 @@ function isOnPlatform(){
         if((x + squareSize) > platformPosition - xAxisFromStart && x < platformPosition + listOfPlatforms[i].platformWidth- xAxisFromStart){
             points = i;
             document.getElementById("points").innerHTML = "points: " + points;
-            if(listOfPlatforms.length < points + 3){
+            if(listOfPlatforms.length < points + 10){
                 AddAdditionalPlatforms();
             }
             return true;
