@@ -227,14 +227,14 @@ function loadingScreen(){
     var id = setInterval(frame, 64);
    
     function frame(){
-     if(loading == 100) {
+     if(loading == 60) {
         preload.style.display = "none";
         clearInterval(id);
         //window.open("welcome.html", "_self");
      }
      else {
       loading = loading + 1;
-      if(loading == 90) {
+      if(loading == 50) {
        preload.style.animation = "fadeout 1s ease";
       }
      }

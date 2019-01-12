@@ -64,15 +64,15 @@ canvas {
  height: 70px;
  border-top: 5px solid azure;
  border-bottom: 5px solid azure;
- animation: clockwisespin 2s linear 3;
+ animation: clockwisespin 1.6s linear 2;
 }
 .loader2 {
  width: 60px;
  height: 60px;
- border-left: 5px solid darkturquoise;
- border-right: 5px solid darkturquoise;
+ border-left: 5px solid darksalmon;
+ border-right: 5px solid darksalmon;
  top: 5px; left: 5px;
- animation: anticlockwisespin 2s linear 3;
+ animation: anticlockwisespin 1.6s linear 2;
 }
 
 
