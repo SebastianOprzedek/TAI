@@ -17,6 +17,15 @@ const strokeColor = '#C40';
 const period = 0.0005;
 const borderPlayerShift = 400;
 const moveValue = 4;
+
+// Get the modal
+let modal = document.getElementById('myModal');
+
+// Get the <span> element that closes the modal
+let span = document.getElementsByClassName("close")[0];
+
+let scoreElement = document.getElementById('score');
+
 voiceVolumeTriggerLevel = 250;
 numberOfSamples = 10;
 xAxisFromStart = 0;
@@ -27,6 +36,8 @@ let x = 0;
 let y = 0;
 let moving = false;
 let over = false;
+let isModalClosed = true;
+let isScreenLoaded = false;
 
 loadingScreen();
 initializeCanvas(c);
@@ -37,12 +48,26 @@ setInterval(function () {
 document.addEventListener("keyup", keyUpAction);
 document.addEventListener("keydown", keyDownAction);
 
+// When the user clicks on <span> (x), close the modal
+span.onclick = function () {
+    modal.style.display = "none";
+    isModalClosed = true;
+};
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function (event) {
+    if (event.target === modal) {
+        modal.style.display = "none";
+        isModalClosed = true;
+    }
+};
+
 function refresh() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     shouldReset();
     drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
     let sumOfPlatformXAxis = 0;
-    if(x <= borderPlayerShift){
+    if (x <= borderPlayerShift) {
         //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
         for (let i = 0; i < listOfPlatforms.length; i++) {
             drawRect(context, sumOfPlatformXAxis, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, listOfPlatforms[i].color, strokeSize, strokeColor);
@@ -50,18 +75,18 @@ function refresh() {
         }
         sumOfPlatformXAxis = 0;
     }
-    else{
-        if(moving){
+    else {
+        if (moving) {
             xAxisFromStart = xAxisFromStart + moveValue;
             x = x - moveValue;
             //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
         }
         for (let i = 0; i < listOfPlatforms.length; i++) {
-            drawRect(context, sumOfPlatformXAxis - xAxisFromStart, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight,  listOfPlatforms[i].color, strokeSize, strokeColor);
+            drawRect(context, sumOfPlatformXAxis - xAxisFromStart, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, listOfPlatforms[i].color, strokeSize, strokeColor);
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
-        sumOfPlatformXAxis= 0;
-    } 
+        sumOfPlatformXAxis = 0;
+    }
 }
 
 function getRandomInt(min, max) {
@@ -72,34 +97,42 @@ function getRandomColor() {
     let color = "#F" + getRandomInt(13, 160);
     return color;
 }
-function createPlatformList(){
+
+function createPlatformList() {
     listOfPlatforms = [
-        { platformGap: getRandomInt(80,250), platformWidth: getRandomInt(80,320), color: getRandomColor() },
+        {platformGap: getRandomInt(80, 250), platformWidth: getRandomInt(80, 320), color: getRandomColor()},
     ];
     AddAdditionalPlatforms();
 }
 
-function AddAdditionalPlatforms(){
-    for (let i = 0; i < 8; i++){
-        listOfPlatforms.push({ platformGap: getRandomInt(80,250), platformWidth: getRandomInt(80,320), color: getRandomColor() })
+function AddAdditionalPlatforms() {
+    for (let i = 0; i < 8; i++) {
+        listOfPlatforms.push({
+            platformGap: getRandomInt(80, 250),
+            platformWidth: getRandomInt(80, 320),
+            color: getRandomColor()
+        })
     }
 }
 
-function shouldReset(){
-    if(!over) {
+function shouldReset() {
+    if (!over) {
         calculatePositions();
         checkIfOver();
     }
     else {
         y--;
-        if((y + platformHeight + squareSize) < -platformBottomMargin){
-            alert("You are dead! Your score: " + points);
+        if ((y + platformHeight + squareSize) < -platformBottomMargin) {
+            //alert("You are dead! Your score: " + points);
+            scoreElement.innerText = points.toString();
+            modal.style.display = "block";
+            isModalClosed = false;
             resetGame();
-        }    
+        }
     }
 }
 
-function resetGame(){
+function resetGame() {
     x = 0;
     y = 0;
     moving = false;
@@ -109,39 +142,39 @@ function resetGame(){
     createPlatformList();
 }
 
-function checkIfOver(){
-    if(y < 0)
+function checkIfOver() {
+    if (y < 0)
         over = true;
 }
 
-function calculatePositions(){
-    if(moving)
+function calculatePositions() {
+    if (moving)
         x = x + moveValue;
-    if (isJumpTriggered())
+    if (isJumpTriggered() && isModalClosed)
         jump();
-    if (isMovingTriggered())
+    if (isMovingTriggered() && isModalClosed)
         startMoving();
     else
         stopMoving();
     if (x > (width + squareSize))
         x = 0;
-    if(y > 0 || !isOnPlatform())
+    if (y > 0 || !isOnPlatform())
         y--;
 }
 
-function isOnPlatform(){
+function isOnPlatform() {
     sumOfXAxisOfPreviousPlatforms = 0;
     for (let i = 0; i < listOfPlatforms.length; i++) {
-        let platformPosition = sumOfXAxisOfPreviousPlatforms;  
+        let platformPosition = sumOfXAxisOfPreviousPlatforms;
         sumOfXAxisOfPreviousPlatforms = platformPosition + (listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap);
-        if((x + squareSize) > platformPosition - xAxisFromStart && x < platformPosition + listOfPlatforms[i].platformWidth- xAxisFromStart){
+        if ((x + squareSize) > platformPosition - xAxisFromStart && x < platformPosition + listOfPlatforms[i].platformWidth - xAxisFromStart) {
             points = i;
             document.getElementById("points").innerHTML = "points: " + points;
-            if(listOfPlatforms.length < points + 10){
+            if (listOfPlatforms.length < points + 10) {
                 AddAdditionalPlatforms();
             }
             return true;
-        }     
+        }
     }
     return false;
 }
@@ -179,7 +212,7 @@ function drawImage(ctx, x, y, width, height, fillColor, strokeSize, strokeColor)
     ctx.beginPath();
     var sticky = new Image();
     sticky.src = "assets\bird-icon.png";
-    sticky.refresh = function() {
+    sticky.refresh = function () {
         context.drawImage(sticky, 0, 0);
     };
     //ctx.drawImage(, x, y, width, height); 
@@ -190,7 +223,7 @@ function drawImage(ctx, x, y, width, height, fillColor, strokeSize, strokeColor)
 }
 
 function keyUpAction(e) {
-    if(!over) {
+    if (!over) {
         let keyCode = e.keyCode;
         if (keyCode === 39) // RIGHT
             stopMoving();
@@ -198,45 +231,45 @@ function keyUpAction(e) {
 }
 
 function keyDownAction(e) {
-    if(!over) {
+    if (!over) {
         let keyCode = e.keyCode;
-        if(keyCode === 38) // UP
+        if (keyCode === 38) // UP
             jump();
-        if(keyCode === 39) // RIGHT
+        if (keyCode === 39) // RIGHT
             startMoving();
     }
 }
 
-function jump(){
+function jump() {
     y += 50;
-    if(y > (height - platformBottomMargin))
+    if (y > (height - platformBottomMargin))
         y = (height - platformBottomMargin);
 }
 
-function startMoving(){
+function startMoving() {
     moving = true;
 }
 
-function stopMoving(){
+function stopMoving() {
     moving = false;
 }
 
-function loadingScreen(){
+function loadingScreen() {
     var preload = document.getElementById("preload");
     var loading = 0;
     var id = setInterval(frame, 64);
-   
-    function frame(){
-     if(loading == 60) {
-        preload.style.display = "none";
-        clearInterval(id);
-        //window.open("welcome.html", "_self");
-     }
-     else {
-      loading = loading + 1;
-      if(loading == 50) {
-       preload.style.animation = "fadeout 1s ease";
-      }
-     }
+
+    function frame() {
+        if (loading === 60) {
+            preload.style.display = "none";
+            clearInterval(id);
+            //window.open("welcome.html", "_self");
+        }
+        else {
+            loading = loading + 1;
+            if (loading === 50) {
+                preload.style.animation = "fadeout 1s ease";
+            }
+        }
     }
-   };
+};

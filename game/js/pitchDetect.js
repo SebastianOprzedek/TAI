@@ -148,7 +148,7 @@ function updatePitch(time) {
     ac = autoCorrelate(buf, audioContext.sampleRate);
     if (ac !== -1) {
         pitchElem.innerText = Math.round(ac);
-        console.log(Math.round(ac));
+        //(Math.round(ac));
     }
     else{
         pitchElem.innerText = "--";
@@ -170,7 +170,7 @@ function updatePitch(time) {
 }
 
 function setVoiceVolume(volume) {
-    console.log("volume:" + volume);
+    //console.log("volume:" + volume);
     if (volume >= voiceVolumeTriggerLevel)
         triggered = true;
 }
