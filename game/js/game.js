@@ -84,7 +84,7 @@ function refresh() {
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
         for (let j = 0; j < listOfBonuses.length; j++) {
-            drawRect(context, sumOfBonusXAxis, bonusYPosition, listOfBonuses[j].bonusWidth, listOfBonuses[j].bonusHeight, listOfBonuses[j].color, strokeSize, strokeColor);
+            drawRect(context, sumOfBonusXAxis, listOfBonuses[j].bonusYPos, listOfBonuses[j].bonusWidth, listOfBonuses[j].bonusHeight, listOfBonuses[j].color, strokeSize, strokeColor);
             sumOfBonusXAxis = sumOfBonusXAxis + listOfBonuses[j].bonusWidth + listOfBonuses[j].bonusGap;
         }
         sumOfPlatformXAxis = 0;
@@ -101,7 +101,7 @@ function refresh() {
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
         for (let j = 0; j < listOfBonuses.length; j++) {
-            drawRect(context, sumOfBonusXAxis - xAxisFromStart, bonusYPosition, listOfBonuses[j].bonusWidth, listOfBonuses[j].bonusHeight, listOfBonuses[j].color, strokeSize, strokeColor);
+            drawRect(context, sumOfBonusXAxis - xAxisFromStart, listOfBonuses[j].bonusYPos, listOfBonuses[j].bonusWidth, listOfBonuses[j].bonusHeight, listOfBonuses[j].color, strokeSize, strokeColor);
             sumOfBonusXAxis = sumOfBonusXAxis + listOfBonuses[j].bonusWidth + listOfBonuses[j].bonusGap;
         }
         sumOfBonusXAxis = 0;
@@ -127,11 +127,11 @@ function createPlatformList() {
 
 function createBonusList() {
     listOfBonuses = [{
-        bonusGap: getRandomInt(1000, 2000),
+        bonusGap: getRandomInt(200, 500),
         bonusWidth: 50,
         bonusHeight: 50,
         color: getRandomColor(),
-        bonusYPos: height - bonusHeight - getRandomInt(500, 800)
+        bonusYPos: height - bonusHeight - getRandomInt(300, 700)
     }];
     AddAdditionalBonuses();
 }
@@ -149,11 +149,11 @@ function AddAdditionalPlatforms() {
 function AddAdditionalBonuses() {
     for (let i = 0; i < 8; i++) {
         listOfBonuses.push({
-            bonusGap: getRandomInt(1000, 2000),
+            bonusGap: getRandomInt(200, 500),
             bonusWidth: 50,
             bonusHeight: 50,
             color: getRandomColor(),
-            bonusYPos: height - bonusHeight - getRandomInt(500, 800)
+            bonusYPos: height - bonusHeight - getRandomInt(300, 700)
         })
     }
 }
@@ -219,10 +219,10 @@ function calculatePositions() {
         x = 0;
     if (y > 0 || !isOnPlatform())
         y--;
-    collidedWithBonus();
+    checkCollision();
 }
 
-function collidedWithBonus() {
+function checkCollision() {
     sumOfAxisOfPreviousBonuses = 0;
     for (let i = 0; i < listOfBonuses.length; i++) {
         let bonusPosition = sumOfAxisOfPreviousBonuses;
@@ -230,7 +230,7 @@ function collidedWithBonus() {
         let squareX = x + (squareSize/2);
         let squareY = y + (squareSize/2);
         let bonusX = bonusPosition + listOfBonuses[i].bonusWidth/2 - xAxisFromStart + 500;
-        let bonusY = bonusYPosition + 400 - listOfBonuses[i].bonusHeight/2 - platformHeight - bonusHeight;
+        let bonusY = listOfBonuses[i].bonusYPos + ((listOfBonuses[i].bonusYPos + bonusHeight - height) * (-1) - platformBottomMargin) - listOfBonuses[i].bonusHeight/2 - platformHeight - bonusHeight;
         let pointsRange = Math.sqrt(Math.pow((squareX - bonusX), 2) + Math.pow((squareY - bonusY), 2));
 
         if (pointsRange < (squareSize/2 + listOfBonuses[i].bonusWidth/2)) {
