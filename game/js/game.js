@@ -6,7 +6,10 @@ const width = window.innerWidth;
 const platformBottomMargin = 200;
 const platformWidth = 250;
 const platformHeight = 50;
+const bonusHeight = 50;
+const bonusBottomMargin = 600;
 const platformYPosition = height - platformHeight - platformBottomMargin;
+const bonusYPosition = height - bonusHeight - bonusBottomMargin;
 const platformGap = 150;
 const squareSize = 100;
 //const numberOfPlatforms = Math.round((width + platformGap) / (platformWidth + platformGap));
@@ -25,13 +28,18 @@ let modal = document.getElementById('myModal');
 let span = document.getElementsByClassName("close")[0];
 
 let scoreElement = document.getElementById('score');
+let lifeElement = document.getElementById("life");
+let lifesCounter = 2;
+document.getElementById("life").innerHTML = "lifes: " + lifesCounter.toString();
 
 voiceVolumeTriggerLevel = 250;
 numberOfSamples = 10;
 xAxisFromStart = 0;
 points = 0;
-listOfPlatforms = new Array();
-sumOfXAxisOfPreviousPlatforms = 0;
+listOfPlatforms = [];
+listOfBonuses = [];
+let sumOfXAxisOfPreviousPlatforms = 0;
+let sumOfAxisOfPreviousBonuses = 0;
 let x = 0;
 let y = 0;
 let moving = false;
@@ -42,6 +50,7 @@ let isScreenLoaded = false;
 loadingScreen();
 initializeCanvas(c);
 createPlatformList();
+createBonusList();
 setInterval(function () {
     refresh();
 }, period);
@@ -67,13 +76,19 @@ function refresh() {
     shouldReset();
     drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
     let sumOfPlatformXAxis = 0;
+    let sumOfBonusXAxis = 500;
     if (x <= borderPlayerShift) {
         //drawImage(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
         for (let i = 0; i < listOfPlatforms.length; i++) {
             drawRect(context, sumOfPlatformXAxis, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, listOfPlatforms[i].color, strokeSize, strokeColor);
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
+        for (let j = 0; j < listOfBonuses.length; j++) {
+            drawRect(context, sumOfBonusXAxis, bonusYPosition, listOfBonuses[j].bonusWidth, listOfBonuses[j].bonusHeight, listOfBonuses[j].color, strokeSize, strokeColor);
+            sumOfBonusXAxis = sumOfBonusXAxis + listOfBonuses[j].bonusWidth + listOfBonuses[j].bonusGap;
+        }
         sumOfPlatformXAxis = 0;
+        sumOfBonusXAxis = 0;
     }
     else {
         if (moving) {
@@ -85,6 +100,11 @@ function refresh() {
             drawRect(context, sumOfPlatformXAxis - xAxisFromStart, platformYPosition, listOfPlatforms[i].platformWidth, platformHeight, listOfPlatforms[i].color, strokeSize, strokeColor);
             sumOfPlatformXAxis = sumOfPlatformXAxis + listOfPlatforms[i].platformWidth + listOfPlatforms[i].platformGap;
         }
+        for (let j = 0; j < listOfBonuses.length; j++) {
+            drawRect(context, sumOfBonusXAxis - xAxisFromStart, bonusYPosition, listOfBonuses[j].bonusWidth, listOfBonuses[j].bonusHeight, listOfBonuses[j].color, strokeSize, strokeColor);
+            sumOfBonusXAxis = sumOfBonusXAxis + listOfBonuses[j].bonusWidth + listOfBonuses[j].bonusGap;
+        }
+        sumOfBonusXAxis = 0;
         sumOfPlatformXAxis = 0;
     }
 }
@@ -100,9 +120,20 @@ function getRandomColor() {
 
 function createPlatformList() {
     listOfPlatforms = [
-        {platformGap: getRandomInt(80, 250), platformWidth: getRandomInt(80, 320), color: getRandomColor()},
+        {platformGap: getRandomInt(100, 250), platformWidth: getRandomInt(80, 320), color: getRandomColor()},
     ];
     AddAdditionalPlatforms();
+}
+
+function createBonusList() {
+    listOfBonuses = [{
+        bonusGap: getRandomInt(1000, 2000),
+        bonusWidth: 50,
+        bonusHeight: 50,
+        color: getRandomColor(),
+        bonusYPos: height - bonusHeight - getRandomInt(500, 800)
+    }];
+    AddAdditionalBonuses();
 }
 
 function AddAdditionalPlatforms() {
@@ -111,6 +142,18 @@ function AddAdditionalPlatforms() {
             platformGap: getRandomInt(80, 250),
             platformWidth: getRandomInt(80, 320),
             color: getRandomColor()
+        })
+    }
+}
+
+function AddAdditionalBonuses() {
+    for (let i = 0; i < 8; i++) {
+        listOfBonuses.push({
+            bonusGap: getRandomInt(1000, 2000),
+            bonusWidth: 50,
+            bonusHeight: 50,
+            color: getRandomColor(),
+            bonusYPos: height - bonusHeight - getRandomInt(500, 800)
         })
     }
 }
@@ -124,10 +167,16 @@ function shouldReset() {
         y--;
         if ((y + platformHeight + squareSize) < -platformBottomMargin) {
             //alert("You are dead! Your score: " + points);
-            scoreElement.innerText = points.toString();
-            modal.style.display = "block";
-            isModalClosed = false;
-            resetGame();
+            if (lifesCounter < 1) {
+                scoreElement.innerText = points.toString();
+                modal.style.display = "block";
+                isModalClosed = false;
+                resetGame();
+            }
+            else {
+                triggerLifeLost();
+                over = false;
+            }
         }
     }
 }
@@ -139,17 +188,27 @@ function resetGame() {
     over = false;
     xAxisFromStart = 0;
     listOfPlatforms = [];
+    listOfBonuses = [];
     createPlatformList();
+    createBonusList();
+}
+
+function triggerLifeLost() {
+    document.getElementById("life").innerHTML = "lifes: " + lifesCounter.toString();
+    y = height;
 }
 
 function checkIfOver() {
-    if (y < 0)
+    if (y < 0) {
+        lifesCounter--;
         over = true;
+    }
 }
 
 function calculatePositions() {
     if (moving)
         x = x + moveValue;
+        console.log(x);
     if (isJumpTriggered() && isModalClosed)
         jump();
     if (isMovingTriggered() && isModalClosed)
@@ -160,6 +219,31 @@ function calculatePositions() {
         x = 0;
     if (y > 0 || !isOnPlatform())
         y--;
+    collidedWithBonus();
+}
+
+function collidedWithBonus() {
+    sumOfAxisOfPreviousBonuses = 0;
+    for (let i = 0; i < listOfBonuses.length; i++) {
+        let bonusPosition = sumOfAxisOfPreviousBonuses;
+        sumOfAxisOfPreviousBonuses = bonusPosition + (listOfBonuses[i].bonusWidth + listOfBonuses[i].bonusGap);
+        let squareX = x + (squareSize/2);
+        let squareY = y + (squareSize/2);
+        let bonusX = bonusPosition + listOfBonuses[i].bonusWidth/2 - xAxisFromStart + 500;
+        let bonusY = bonusYPosition + 400 - listOfBonuses[i].bonusHeight/2 - platformHeight - bonusHeight;
+        let pointsRange = Math.sqrt(Math.pow((squareX - bonusX), 2) + Math.pow((squareY - bonusY), 2));
+
+        if (pointsRange < (squareSize/2 + listOfBonuses[i].bonusWidth/2)) {
+            if(listOfBonuses[i].bonusHeight == 0)
+                break;
+            lifesCounter++;
+            document.getElementById("life").innerHTML = "lifes: " + lifesCounter;
+            if (listOfBonuses.length < i + 10) {
+                AddAdditionalBonuses();
+            }
+            listOfBonuses[i].bonusHeight = 0;
+        }
+    }
 }
 
 function isOnPlatform() {
@@ -272,4 +356,4 @@ function loadingScreen() {
             }
         }
     }
-};
+}
