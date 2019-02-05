@@ -36,9 +36,10 @@ voiceVolumeTriggerLevel = 250;
 numberOfSamples = 10;
 xAxisFromStart = 0;
 points = 0;
-listOfPlatforms = new Array();
-listOfBonuses = new Array();
-sumOfXAxisOfPreviousPlatforms = 0;
+listOfPlatforms = [];
+listOfBonuses = [];
+let sumOfXAxisOfPreviousPlatforms = 0;
+let sumOfAxisOfPreviousBonuses = 0;
 let x = 0;
 let y = 0;
 let moving = false;
@@ -125,9 +126,13 @@ function createPlatformList() {
 }
 
 function createBonusList() {
-    listOfBonuses = [
-        {bonusGap: getRandomInt(1000, 2000), bonusWidth: 50, bonusHeight: 50, color: getRandomColor()}
-    ];
+    listOfBonuses = [{
+        bonusGap: getRandomInt(1000, 2000),
+        bonusWidth: 50,
+        bonusHeight: 50,
+        color: getRandomColor(),
+        bonusYPos: height - bonusHeight - getRandomInt(500, 800)
+    }];
     AddAdditionalBonuses();
 }
 
@@ -144,10 +149,11 @@ function AddAdditionalPlatforms() {
 function AddAdditionalBonuses() {
     for (let i = 0; i < 8; i++) {
         listOfBonuses.push({
-            bonusGap: getRandomInt(500, 1000),
+            bonusGap: getRandomInt(1000, 2000),
             bonusWidth: 50,
             bonusHeight: 50,
-            color: getRandomColor()
+            color: getRandomColor(),
+            bonusYPos: height - bonusHeight - getRandomInt(500, 800)
         })
     }
 }
@@ -202,6 +208,7 @@ function checkIfOver() {
 function calculatePositions() {
     if (moving)
         x = x + moveValue;
+        console.log(x);
     if (isJumpTriggered() && isModalClosed)
         jump();
     if (isMovingTriggered() && isModalClosed)
@@ -212,6 +219,31 @@ function calculatePositions() {
         x = 0;
     if (y > 0 || !isOnPlatform())
         y--;
+    collidedWithBonus();
+}
+
+function collidedWithBonus() {
+    sumOfAxisOfPreviousBonuses = 0;
+    for (let i = 0; i < listOfBonuses.length; i++) {
+        let bonusPosition = sumOfAxisOfPreviousBonuses;
+        sumOfAxisOfPreviousBonuses = bonusPosition + (listOfBonuses[i].bonusWidth + listOfBonuses[i].bonusGap);
+        let squareX = x + (squareSize/2);
+        let squareY = y + (squareSize/2);
+        let bonusX = bonusPosition + listOfBonuses[i].bonusWidth/2 - xAxisFromStart + 500;
+        let bonusY = bonusYPosition + 400 - listOfBonuses[i].bonusHeight/2 - platformHeight - bonusHeight;
+        let pointsRange = Math.sqrt(Math.pow((squareX - bonusX), 2) + Math.pow((squareY - bonusY), 2));
+
+        if (pointsRange < (squareSize/2 + listOfBonuses[i].bonusWidth/2)) {
+            if(listOfBonuses[i].bonusHeight == 0)
+                break;
+            lifesCounter++;
+            document.getElementById("life").innerHTML = "lifes: " + lifesCounter;
+            if (listOfBonuses.length < i + 10) {
+                AddAdditionalBonuses();
+            }
+            listOfBonuses[i].bonusHeight = 0;
+        }
+    }
 }
 
 function isOnPlatform() {
