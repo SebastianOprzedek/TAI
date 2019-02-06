@@ -75,6 +75,7 @@ function refresh() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     shouldReset();
     drawRect(context, x, platformYPosition - squareSize - y, squareSize, squareSize, fillColor, strokeSize, strokeColor);
+    checkCollision();
     let sumOfPlatformXAxis = 0;
     let sumOfBonusXAxis = 500;
     if (x <= borderPlayerShift) {
@@ -131,7 +132,8 @@ function createBonusList() {
         bonusWidth: 50,
         bonusHeight: 50,
         color: getRandomColor(),
-        bonusYPos: height - bonusHeight - getRandomInt(300, 700)
+        //bonusYPos: height - bonusHeight - getRandomInt(250, 700)
+        bonusYPos: platformYPosition - getRandomInt(0, (height - platformHeight - platformBottomMargin - 80)) - platformHeight
     }];
     AddAdditionalBonuses();
 }
@@ -153,7 +155,8 @@ function AddAdditionalBonuses() {
             bonusWidth: 50,
             bonusHeight: 50,
             color: getRandomColor(),
-            bonusYPos: height - bonusHeight - getRandomInt(300, 700)
+            //bonusYPos: height - bonusHeight - getRandomInt(250, 700)
+            bonusYPos: platformYPosition - getRandomInt(0, (height - platformHeight - platformBottomMargin - 80)) - platformHeight
         })
     }
 }
@@ -208,18 +211,17 @@ function checkIfOver() {
 function calculatePositions() {
     if (moving)
         x = x + moveValue;
-        console.log(x);
     if (isJumpTriggered() && isModalClosed)
         jump();
     if (isMovingTriggered() && isModalClosed)
         startMoving();
     else
         stopMoving();
+    //situation when square leaves screen on the right side
     if (x > (width + squareSize))
         x = 0;
     if (y > 0 || !isOnPlatform())
         y--;
-    checkCollision();
 }
 
 function checkCollision() {
@@ -228,9 +230,11 @@ function checkCollision() {
         let bonusPosition = sumOfAxisOfPreviousBonuses;
         sumOfAxisOfPreviousBonuses = bonusPosition + (listOfBonuses[i].bonusWidth + listOfBonuses[i].bonusGap);
         let squareX = x + (squareSize/2);
-        let squareY = y + (squareSize/2);
+        //let squareY = y + (squareSize/2);
+        let squareY = platformYPosition - y  - squareSize/2 - platformHeight;
         let bonusX = bonusPosition + listOfBonuses[i].bonusWidth/2 - xAxisFromStart + 500;
-        let bonusY = listOfBonuses[i].bonusYPos + ((listOfBonuses[i].bonusYPos + bonusHeight - height) * (-1) - platformBottomMargin) - listOfBonuses[i].bonusHeight/2 - platformHeight - bonusHeight;
+        //let bonusY = listOfBonuses[i].bonusYPos + (((listOfBonuses[i].bonusYPos + bonusHeight - height) * (-1)) - platformBottomMargin) - listOfBonuses[i].bonusHeight/2 - platformHeight - bonusHeight;
+        let bonusY = listOfBonuses[i].bonusYPos;
         let pointsRange = Math.sqrt(Math.pow((squareX - bonusX), 2) + Math.pow((squareY - bonusY), 2));
 
         if (pointsRange < (squareSize/2 + listOfBonuses[i].bonusWidth/2)) {
@@ -325,9 +329,12 @@ function keyDownAction(e) {
 }
 
 function jump() {
-    y += 50;
-    if (y > (height - platformBottomMargin))
-        y = (height - platformBottomMargin);
+    if (y > (height - platformBottomMargin - squareSize*1.5)){
+        y = (height - platformBottomMargin - squareSize*1.5);
+    }
+    else{
+        y += 20;
+    }
 }
 
 function startMoving() {
