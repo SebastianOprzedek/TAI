@@ -19,7 +19,8 @@ const strokeSize = 5;
 const strokeColor = '#C40';
 const period = 0.0005;
 const borderPlayerShift = 400;
-const moveValue = 4;
+let moveValue = 4;
+let decrementValue = 1;
 
 // Get the modal
 let modal = document.getElementById('myModal');
@@ -29,7 +30,7 @@ let span = document.getElementsByClassName("close")[0];
 
 let scoreElement = document.getElementById('score');
 let lifeElement = document.getElementById("life");
-let lifesCounter = 2;
+let lifesCounter = 1;
 document.getElementById("life").innerHTML = "lifes: " + lifesCounter.toString();
 
 voiceVolumeTriggerLevel = 250;
@@ -127,13 +128,20 @@ function createPlatformList() {
 }
 
 function createBonusList() {
+    let negRNG = getRandomInt(0, 100);
+    let posRNG = getRandomInt(0,40);
     listOfBonuses = [{
-        bonusGap: getRandomInt(200, 500),
+        bonusGap: getRandomInt(200, 400),
         bonusWidth: 50,
         bonusHeight: 50,
-        color: getRandomColor(),
-        //bonusYPos: height - bonusHeight - getRandomInt(250, 700)
-        bonusYPos: platformYPosition - getRandomInt(0, (height - platformHeight - platformBottomMargin - 80)) - platformHeight
+        bonusYPos: platformYPosition - getRandomInt(0, (height - platformHeight - platformBottomMargin - 80) -150 ) - platformHeight,
+        color: negRNG < 80 ? '#000000' : (
+            posRNG < 10 ? '#00FF00' : (
+                posRNG < 20 ? '#FF0000' : (
+                    posRNG < 30 ? '#0000FF' : '#FFFFFF'
+                )
+            )
+        )
     }];
     AddAdditionalBonuses();
 }
@@ -150,13 +158,20 @@ function AddAdditionalPlatforms() {
 
 function AddAdditionalBonuses() {
     for (let i = 0; i < 8; i++) {
+        let negRNG = getRandomInt(0, 100);
+        let posRNG = getRandomInt(0,40);
         listOfBonuses.push({
-            bonusGap: getRandomInt(200, 500),
+            bonusGap: getRandomInt(200, 400),
             bonusWidth: 50,
             bonusHeight: 50,
-            color: getRandomColor(),
-            //bonusYPos: height - bonusHeight - getRandomInt(250, 700)
-            bonusYPos: platformYPosition - getRandomInt(0, (height - platformHeight - platformBottomMargin - 80)) - platformHeight
+            color: negRNG < 80 ? '#000000' : (
+                posRNG < 10 ? '#00FF00' : (
+                    posRNG < 20 ? '#FF0000' : (
+                        posRNG < 30 ? '#0000FF' : '#FFFFFF'
+                    )
+                )
+            ),
+            bonusYPos: platformYPosition - getRandomInt(0, (height - platformHeight - platformBottomMargin - 80) - 150) - platformHeight
         })
     }
 }
@@ -185,10 +200,13 @@ function shouldReset() {
 }
 
 function resetGame() {
+    decrementValue = 1;
+    moveValue = 4;
     x = 0;
     y = 0;
     moving = false;
     over = false;
+    lifesCounter = 1;
     xAxisFromStart = 0;
     listOfPlatforms = [];
     listOfBonuses = [];
@@ -221,7 +239,7 @@ function calculatePositions() {
     if (x > (width + squareSize))
         x = 0;
     if (y > 0 || !isOnPlatform())
-        y--;
+        y = y - decrementValue;
 }
 
 function checkCollision() {
@@ -240,10 +258,29 @@ function checkCollision() {
         if (pointsRange < (squareSize/2 + listOfBonuses[i].bonusWidth/2)) {
             if(listOfBonuses[i].bonusHeight == 0)
                 break;
-            lifesCounter++;
-            document.getElementById("life").innerHTML = "lifes: " + lifesCounter;
-            if (listOfBonuses.length < i + 10) {
-                AddAdditionalBonuses();
+            if(listOfBonuses[i].color == '#000000'){
+                if (lifesCounter == 1) {
+                    scoreElement.innerText = points.toString();
+                    modal.style.display = "block";
+                    isModalClosed = false;
+                    resetGame();
+                    return;
+                }
+                lifesCounter--;
+                document.getElementById("life").innerHTML = "lifes: " + lifesCounter.toString();
+            }
+            else if (listOfBonuses[i].color == '#00FF00'){
+                lifesCounter++;
+                document.getElementById("life").innerHTML = "lifes: " + lifesCounter;
+            }
+            else if (listOfBonuses[i].color == '#FF0000'){
+                moveValue *= 2;
+            }
+            else if (listOfBonuses[i].color == '#FFFFFF'){
+                moveValue = moveValue /2;
+            }
+            else if (listOfBonuses[i].color == '#0000FF'){
+                decrementValue = decrementValue /2;
             }
             listOfBonuses[i].bonusHeight = 0;
         }
@@ -260,6 +297,9 @@ function isOnPlatform() {
             document.getElementById("points").innerHTML = "points: " + points;
             if (listOfPlatforms.length < points + 10) {
                 AddAdditionalPlatforms();
+            }
+            if (listOfBonuses.length < i + 8) {
+                AddAdditionalBonuses();
             }
             return true;
         }
